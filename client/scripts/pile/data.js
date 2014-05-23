@@ -74,24 +74,6 @@ define([
     return deferred.promise;
   };
 
-  // pileDataModule.factory('camPileData', [function() {
-
-  //   // Configure Hyperagent to prefix every URL with the unicorn proxy.
-  //   Hyperagent.configure('ajax', function(options) {
-  //     options.url = 'https://unicorn-cors-proxy.herokuapp.com/' + options.url;
-
-  //     return $.ajax(options);
-  //   });
-
-  //   return new Hyperagent.Resource({
-  //     url: '/',
-  //     headers: {
-  //       // 'X-Requested-With': 'Hyperagent'
-  //     }
-  //   });
-  //   return new CamPileData();
-  // }]);
-
   pileDataModule.factory('camPileData', [
           '$q',
   function($q) {

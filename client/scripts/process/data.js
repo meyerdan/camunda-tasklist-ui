@@ -6,41 +6,32 @@ define([
 // ], function(angular,   $,        Hyperagent) {
            'angular', 'jquery'
 ], function(angular,   $) {
-
-  /**
-   * @module cam.tasklist.session.data
-   */
-
-  /**
-   * @memberof cam.tasklist.session
-   */
-
-  var sessionDataModule = angular.module('cam.tasklist.session.data', []);
+  var processDataModule = angular.module('cam.tasklist.process.data', []);
 
 
-  function CamSessionData(config) {
+  function CamProcessData(config) {
     config = config || {};
     if (!config.defer) { throw new Error('defer must be passed in the configuration'); }
     this.defer = config.defer;
   }
 
-  CamSessionData.prototype.get   = function(id, options) {
+  CamProcessData.prototype.get   = function(id, options) {
     var deferred = this.defer();
     options = options || {};
-    var session;
+    var process;
     var query = {};
     if (id.id) {
-      session = id;
-      id = session.id;
+      process = id;
+      id = process.id;
     }
 
 
     $.ajax({
-      url: '/tasklist/sessions/'+ id,
+      url: '/tasklist/processs/'+ id,
       data: query
     })
     .done(function(data) {
-      deferred.resolve(data._embedded.sessions);
+      deferred.resolve(data._embedded.processs);
     })
     .fail(function(jqXHR, textStatus, errorThrown) {
       deferred.reject(textStatus);
@@ -52,23 +43,23 @@ define([
     return deferred.promise;
   };
 
-  CamSessionData.prototype.query = function(options) {
+  CamProcessData.prototype.query = function(options) {
     var deferred = this.defer();
     options = options || {};
 
     deferred.notify('request:start');
 
     var query = {};
-    if (options.session) {
-      query.session = options.session.id || options.session;
+    if (options.process) {
+      query.process = options.process.id || options.process;
     }
 
     $.ajax({
-      url: '/tasklist/sessions',
+      url: '/tasklist/processs',
       data: query
     })
     .done(function(data) {
-      deferred.resolve(data._embedded.sessions);
+      deferred.resolve(data._embedded.processs);
     })
     .fail(function(jqXHR, textStatus, errorThrown) {
       deferred.reject(textStatus);
@@ -80,11 +71,11 @@ define([
     return deferred.promise;
   };
 
-  sessionDataModule.factory('camSessionData', [
+  processDataModule.factory('camProcessData', [
           '$q',
   function($q) {
-    return new CamSessionData({$q: $q});
+    return new CamProcessData({$q: $q});
   }]);
 
-  return sessionDataModule;
+  return processDataModule;
 });

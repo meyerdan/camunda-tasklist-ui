@@ -2,8 +2,13 @@
 if (typeof define !== 'function') { var define = require('amdefine')(module); }
 /* jshint unused: false */
 define([
-           'require', 'angular', 'moment', 'camunda-tasklist/pile/data'
-], function(require, angular,   moment) {
+           'require', 'angular', 'moment',
+           'camunda-tasklist/pile/data',
+           'text!camunda-tasklist/pile/form.html',
+           'text!camunda-tasklist/pile/list.html',
+           'text!camunda-tasklist/pile/details.html',
+           'text!camunda-tasklist/pile/tasks.html'
+], function(require,   angular,   moment) {
   var pileModule = angular.module('cam.tasklist.pile', [
     'cam.tasklist.pile.data',
     'ui.bootstrap',
@@ -11,9 +16,12 @@ define([
     'angularMoment'
   ]);
 
-  console.info('urls', require.toUrl('camunda-tasklist/pile/pile-tasks.html'));
-
   var modalUID = 0;
+  var $ = angular.element;
+
+
+
+
 
   pileModule.directive('camTasklistPile', [
           '$modal', '$rootScope',
@@ -92,11 +100,25 @@ define([
         }
       },
 
-      templateUrl: require.toUrl('camunda-tasklist/pile/pile-details.html')
+      template: require('text!camunda-tasklist/pile/details.html')
     };
   }]);
 
-  pileModule.directive('camPileTasks', [
+
+
+
+  pileModule.directive('camTasklistPiles', [
+          '$modal', '$rootScope',
+  function($modal,   $rootScope) {
+    return {
+      template: require('text!camunda-tasklist/pile/list.html')
+    };
+  }]);
+
+
+
+
+  pileModule.directive('camTasklistPileTasks', [
           '$modal', '$rootScope', 'camPileData',
   function($modal,   $rootScope,   camPileData) {
     return {
@@ -126,8 +148,66 @@ define([
         };
       },
 
-      templateUrl: require.toUrl('camunda-tasklist/pile/pile-tasks.html')
+      template: require('text!camunda-tasklist/pile/tasks.html')
     };
+  }]);
+
+
+
+
+
+
+
+  pileModule.controller('pilesCtrl', [
+           '$scope', '$rootScope', '$modal', 'camPileData',
+  function ($scope,   $rootScope,   $modal,   camPileData) {
+    $scope.piles = [];
+
+    camPileData.query({
+      user: $scope.user
+    }).then(function(piles) {
+      console.info('camPileData piles', piles);
+      $scope.piles = piles;
+      $rootScope.focusedPile = $scope.piles[2];
+      $rootScope.$emit('tasklist.pile.focused');
+    }, function(err) {
+      console.info('camPileData query error', err.stack);
+    });
+  }]);
+
+
+  pileModule.controller('pileNewCtrl', [
+          '$modal', '$scope', '$rootScope',
+  function($modal,   $scope,   $rootScope) {
+    console.warn('Should open a modal window with new pile form.');
+    $rootScope.focusedPile = {
+      name: '',
+      description: '',
+      color: '',
+      filters: []
+    };
+
+    $('.task-board').addClass('pile-edit');
+
+    var modalInstance = $modal.open({
+      // pass the current scope to the $modalInstance
+      scope: $scope,
+
+      size: 'lg',
+
+      template: require('text!camunda-tasklist/pile/form.html'),
+
+      controller: [
+              '$modalInstance',
+      function($modalInstance) {
+        console.info('Hello from the modal instance controller', $modalInstance);
+      }]
+    })
+    .result.then(function(result) {
+      console.info('modalInstance created', result);
+    }, function(reason) {
+      console.info('modalInstance aborted', reason);
+    });
   }]);
 
   return pileModule;

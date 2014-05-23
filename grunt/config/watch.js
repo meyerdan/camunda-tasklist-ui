@@ -32,7 +32,8 @@ module.exports = function(config) {
         'client/scripts/**/*.{js,html}'
       ],
       tasks: [
-        'newer:jshint',
+        'newer:jshint:scripts',
+        // 'requirejs:dependencies',
         'requirejs:scripts'
       ]
     },
@@ -69,7 +70,7 @@ module.exports = function(config) {
     },
 
     served: {
-      files: ['dist/**/*'],
+      files: ['dist/**/*.{js,css,jpg,png,webp,eot,svg,ttf,otf,woff}'],
       tasks: [],
       options: {
         livereload: parseInt(config.livereloadPort || 35729)

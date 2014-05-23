@@ -2,9 +2,17 @@
 if (typeof define !== 'function') { var define = require('amdefine')(module); }
 /* jshint unused: false */
 define([
-           'angular', 'moment', 'camunda-tasklist/task/data', 'camunda-tasklist/form/data', 'angular-bootstrap'
+           'angular', 'moment',
+           'camunda-tasklist/utils',
+           'camunda-tasklist/task/data',
+           'camunda-tasklist/form/data',
+           'angular-bootstrap',
+           'text!camunda-tasklist/task/task.html',
+           'text!camunda-tasklist/task/form.html',
+           'text!camunda-tasklist/task/history.html'
 ], function(angular,   moment) {
-  var taskModule = require('angular').module('cam.tasklist.task', [
+  var taskModule = angular.module('cam.tasklist.task', [
+    'cam.tasklist.utils',
     'cam.tasklist.task.data',
     'cam.tasklist.form.data',
     'ui.bootstrap',
@@ -12,11 +20,17 @@ define([
     'angularMoment'
   ]);
 
-  var c = 0;
+  /**
+   * @module cam.tasklist.task
+   */
+
+  /**
+   * @memberof cam.tasklist
+   */
 
   taskModule.directive('camTasklistTask', [
-          '$modal', '$rootScope',
-  function($modal,   $rootScope) {
+          '$modal', '$rootScope', 'camUID',
+  function($modal,   $rootScope,   camUID) {
     $rootScope.batchActions = {};
     $rootScope.batchActions.selected = [];
 
@@ -24,8 +38,7 @@ define([
       link: function(scope, element) {
         scope.task = scope.task || $rootScope.focusedTask;
 
-        scope.elUID = c;
-        c++;
+        scope.elUID = camUID();
 
         element.find('.nav li').eq(0).addClass('active');
         element.find('.tab-pane').eq(0).addClass('active');
@@ -35,18 +48,17 @@ define([
           element.find('[data-toggle="tooltip"]').tooltip();
         });
       },
-      templateUrl: 'scripts/task/task.html'
+      template: require('text!camunda-tasklist/task/task.html')
     };
   }]);
 
   // should be moved to the form module...
   taskModule.directive('camTasklistTaskForm', [
-          'camTaskFormData', '$rootScope',
-  function(camTaskFormData,   $rootScope) {
+          'camTaskFormData', '$rootScope', 'camUID',
+  function(camTaskFormData,   $rootScope,   camUID) {
     return {
       link: function(scope, element) {
-        scope.elUID = c;
-        c++;
+        scope.elUID = camUID();
 
         scope.labelsWidth = 3;
         scope.fieldsWidth = 12 - scope.labelsWidth;
@@ -56,7 +68,7 @@ define([
           element.find('[data-toggle="tooltip"]').tooltip();
         });
       },
-      templateUrl: 'scripts/form/form.html'
+      template: require('text!camunda-tasklist/task/form.html')
     };
   }]);
 
@@ -94,7 +106,7 @@ define([
           }, 10);
         });
       },
-      templateUrl: 'scripts/task/history.html'
+      template: require('text!camunda-tasklist/task/history.html')
     };
   }]);
 

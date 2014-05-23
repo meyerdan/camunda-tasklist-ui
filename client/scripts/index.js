@@ -2,15 +2,24 @@
 if (typeof define !== 'function') { var define = require('amdefine')(module); }
 /* jshint unused: false */
 define('camunda-tasklist', [
-           'camunda-tasklist/rjsconf'
-], function(rjsConf) {
+           'camunda-tasklist/rjsconf',
+           'camunda-tasklist/utils'
+], function(rjsConf, utils) {
+  /**
+   * @namespace cam
+   */
+
+  /**
+   * @module cam.tasklist
+   */
 
   var tasklistApp;
 
   var appModules = rjsConf.shim['camunda-tasklist'];
 
   var deps = [
-    'angular'
+    'angular',
+    'text!tasklist.html'
   ].concat(appModules);
 
   // converts AMD paths to angular module names
@@ -32,10 +41,10 @@ define('camunda-tasklist', [
     var ngDeps = rj2ngNames(appModules).concat([
       'ngRoute'
     ]);
-    console.info('rj2ngNames(appModules)', appModules.join('\n'), '\n\n\n', ngDeps.join('\n'));
+
     tasklistApp = angular.module('cam.tasklist', ngDeps);
 
-    tasklistApp.controller('TasklistCtrl', [
+    tasklistApp.controller('TasklistAppCtrl', [
             '$rootScope',
     function($rootScope) {
       $rootScope.batchActions = {
@@ -53,59 +62,50 @@ define('camunda-tasklist', [
         }
       });
 
-      $scope.newPile = function() {
-        $rootScope.focusedPile = {
-          name: '',
-          description: '',
-          color: '',
-          filters: []
-        };
-
-        $('.task-board').addClass('pile-edit');
-
-
-
-
-        var newPileModalCtrl = [
-                '$modalInstance',
-        function($modalInstance) {
-          console.info('Hello from the modal instance controller', $modalInstance);
-        }];
-
-        function created(result) {
-          console.info('modalInstance created', result);
-        }
-
-        function aborted(reason) {
-          console.info('modalInstance aborted', reason);
-        }
-
-        var modalInstance = $modal.open({
-          // pass the current scope to the $modalInstance
-          scope: $scope,
-
-          size: 'lg',
-
-          template: '<div>papi papo {{ user }}  {{ piles }}</div>',
-
-          controller: newPileModalCtrl
-        })
-        .result.then(created, aborted);
+      $rootScope.user = {
+        id:   'max',
+        name: 'Max Mustermann'
       };
-
-      camPileData.query({
-        user: $scope.user
-      }).then(function(piles) {
-        $scope.piles = piles;
-        $rootScope.focusedPile = $scope.piles[2];
-        $rootScope.$emit('tasklist.pile.focused');
-      }, function(err) {
-        console.info('camPileData query error', err.stack);
-      });
     }]);
 
-    // with require.js, you need to bootstrap manually
-    require(['domready'], function() {
+
+    tasklistApp.config([
+            '$routeProvider', '$locationProvider',
+    function($routeProvider,   $locationProvider) {
+      var tasklistTemplate = require('text!tasklist.html');
+
+      $routeProvider
+        .when('/process', {
+          template: tasklistTemplate,
+          controller: 'processStartCtrl'
+        })
+
+
+        .when('/piles/new', {
+          template: tasklistTemplate,
+          controller: 'pileNewCtrl'
+        })
+
+
+        .when('/', {
+          template: tasklistTemplate,
+          controller: 'pilesCtrl'
+        })
+
+
+        .when('/login', {
+          template: tasklistTemplate,
+          controller: [function() {
+            console.warn('Present a login form...');
+          }]
+        })
+
+        .otherwise({
+          redirectTo: '/'
+        });
+    }]);
+
+    $(document).ready(function() {
       angular.bootstrap(document, ['cam.tasklist']);
     });
   }

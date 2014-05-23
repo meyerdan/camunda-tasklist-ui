@@ -7,6 +7,7 @@ define(function() {
 
     paths: {
       'domready':                   'bower_components/requirejs-domready/domReady',
+      'text':                       'bower_components/requirejs-text/text',
 
       'angular':                    'bower_components/angular/angular',
       'angular-route':              'bower_components/angular-route/angular-route',
@@ -24,6 +25,7 @@ define(function() {
       'camunda-tasklist/form':      'scripts/form',
       'camunda-tasklist/pile':      'scripts/pile',
       'camunda-tasklist/task':      'scripts/task',
+      'camunda-tasklist/process':   'scripts/process',
 
 
       'jquery-mockjax':             'bower_components/jquery-mockjax/jquery.mockjax',
@@ -53,15 +55,15 @@ define(function() {
 
 
       'camunda-tasklist':           [
-                                      // 'angular-bootstrap',
-                                      // 'angular-moment',
-
                                       'angular-route',
 
+                                      'text!tasklist.html',
+                                      'camunda-tasklist/utils',
                                       'camunda-tasklist/controls',
                                       'camunda-tasklist/form',
                                       'camunda-tasklist/pile',
                                       'camunda-tasklist/task',
+                                      'camunda-tasklist/process',
 
                                       'camunda-tasklist/mocks'
                                     ],
@@ -84,6 +86,10 @@ define(function() {
       },
       {
         name: 'camunda-tasklist/controls',
+        main: 'index'
+      },
+      {
+        name: 'camunda-tasklist/process',
         main: 'index'
       },
       {

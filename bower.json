@@ -43,7 +43,8 @@
     "underscore": "./node_modules/underscore/underscore.js",
     "underscore.string": "./node_modules/underscore.string/lib/underscore.string.js",
     "fixturer": "./node_modules/fixturer/index.js",
-    "node-uuid": "~1.4.1"
+    "node-uuid": "~1.4.1",
+    "requirejs-text": "~2.0.12"
   },
   "resolutions": {
     "jquery": "~2.1.1"

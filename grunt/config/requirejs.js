@@ -25,6 +25,8 @@ module.exports = function(config) {
 
   var rConf = {
     options: {
+      stubModules: ['text'],
+
       // optimize: 'uglify2',
       // preserveLicenseComments: false,
       // generateSourceMaps: true,
@@ -33,7 +35,7 @@ module.exports = function(config) {
       preserveLicenseComments: true,
       generateSourceMaps: false,
 
-      // baseUrl: rjsConf.baseUrl,
+
       baseUrl: './client',
       paths: rjsConf.paths,
       shim: rjsConf.shim,
@@ -56,7 +58,7 @@ module.exports = function(config) {
         on the plugin, may or may not have something inlined in the
         module bundle.
         */
-        // console.info('onModuleBundleComplete', data);
+        console.info('onModuleBundleComplete', '\n'+data.included.join('\n'));
 
         // // add a timestamp to the sourcemap URL to prevent caching
         // fs.readFile(data.path, {encoding: 'utf8'}, function(err, content) {
@@ -76,14 +78,14 @@ module.exports = function(config) {
       //   return contents;//.replace(/foo/g, 'bar');
       // },
 
-      //A function that will be called for every write to an optimized bundle
-      //of modules. This allows transforms of the content before serialization.
-      onBuildWrite: function (moduleName, path, contents) {
-        console.info('onBuildWrite', moduleName);
-        //Always return a value.
-        //This is just a contrived example.
-        return contents;//.replace(/bar/g, 'foo');
-      }
+      // //A function that will be called for every write to an optimized bundle
+      // //of modules. This allows transforms of the content before serialization.
+      // onBuildWrite: function (moduleName, path, contents) {
+      //   console.info('onBuildWrite', moduleName);
+      //   //Always return a value.
+      //   //This is just a contrived example.
+      //   return contents;//.replace(/bar/g, 'foo');
+      // }
     },
 
 
@@ -93,7 +95,11 @@ module.exports = function(config) {
         name: '<%= pkg.name %>-deps',
         out: 'dist/scripts/deps.js',
         // include: deps
-        include: deps.concat(['camunda-tasklist/rjsconf'])
+        include: deps.concat([
+          'camunda-tasklist/rjsconf',
+          'camunda-tasklist/mocks',
+          'angular-route'
+        ])
       }
     },
 
@@ -124,10 +130,14 @@ module.exports = function(config) {
         name: 'camunda-tasklist',
         out: 'dist/scripts/<%= pkg.name %>.js',
         // exclude: deps,
-        exclude: deps.concat(['camunda-tasklist/rjsconf']),
+        exclude: deps.concat([
+          'camunda-tasklist/rjsconf',
+          'camunda-tasklist/mocks',
+          'angular-route'
+        ]),
         include: rjsConf.shim['camunda-tasklist'].concat([
           // 'hyperagent',
-          'camunda-tasklist/mocks'
+          // 'camunda-tasklist/mocks'
         ])
       }
     }
