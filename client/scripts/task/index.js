@@ -36,15 +36,15 @@ define([
 
     return {
       link: function(scope, element) {
-        scope.task = scope.task || $rootScope.focusedTask;
+        scope.task = scope.task || $rootScope.currentTask;
 
         scope.elUID = camUID();
 
         element.find('.nav li').eq(0).addClass('active');
         element.find('.tab-pane').eq(0).addClass('active');
 
-        $rootScope.$on('tasklist.task.focused', function() {
-          scope.task = $rootScope.focusedTask;
+        $rootScope.$on('tasklist.task.current', function() {
+          scope.task = $rootScope.currentTask;
           element.find('[data-toggle="tooltip"]').tooltip();
         });
       },
@@ -63,7 +63,7 @@ define([
         scope.labelsWidth = 3;
         scope.fieldsWidth = 12 - scope.labelsWidth;
 
-        $rootScope.$on('tasklist.task.focused', function() {
+        $rootScope.$on('tasklist.task.current', function() {
           scope.fields = camTaskFormData();
           element.find('[data-toggle="tooltip"]').tooltip();
         });
@@ -80,7 +80,7 @@ define([
         scope.history = [];
         scope.days = [];
 
-        $rootScope.$on('tasklist.task.focused', function() {
+        $rootScope.$on('tasklist.task.current', function() {
           scope.history = camTaskHistoryData(null, null);
           scope.now = new Date();
           var days = {};

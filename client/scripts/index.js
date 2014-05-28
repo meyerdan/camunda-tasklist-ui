@@ -5,6 +5,9 @@ define('camunda-tasklist', [
            'camunda-tasklist/rjsconf',
            'camunda-tasklist/utils'
 ], function(rjsConf, utils) {
+  rjsConf.shim['camunda-tasklist'].push('camunda-tasklist/mocks');
+  var tasklistConf = typeof window !== 'undefined' ? (window.tasklistConf || {}) : {};
+
   /**
    * @namespace cam
    */
@@ -19,7 +22,7 @@ define('camunda-tasklist', [
 
   var deps = [
     'angular',
-    'text!tasklist.html'
+    'text!camunda-tasklist/index.html'
   ].concat(appModules);
 
   // converts AMD paths to angular module names
@@ -45,37 +48,40 @@ define('camunda-tasklist', [
     tasklistApp = angular.module('cam.tasklist', ngDeps);
 
     tasklistApp.controller('TasklistAppCtrl', [
-            '$rootScope',
-    function($rootScope) {
+            '$rootScope', 'camStorage',
+    function($rootScope,   camStorage) {
+      $rootScope.$on('tasklist.pile.current', function() {
+        $('.task-board').removeClass('pile-edit');
+        if ($rootScope.currentPile) {
+          $('.controls .current-pile h5').text($rootScope.currentPile.name || '&nbsp;');
+        }
+      });
+
       $rootScope.batchActions = {
         selected: []
       };
 
-      $rootScope.focusedPile = {};
+      $rootScope.currentPile = camStorage('currentPile') || {};
 
-      $rootScope.focusedTask = {};
+      $rootScope.currentTask = camStorage('currentTask') || {};
 
-      $rootScope.$on('tasklist.pile.focused', function() {
-        $('.task-board').removeClass('pile-edit');
-        if ($rootScope.focusedPile) {
-          $('.controls .focused-pile h5').text($rootScope.focusedPile.name || '&nbsp;');
-        }
-      });
-
-      $rootScope.user = {
-        id:   'max',
-        name: 'Max Mustermann'
-      };
+      $rootScope.user = camStorage('user') || {};
     }]);
 
 
     tasklistApp.config([
             '$routeProvider', '$locationProvider',
     function($routeProvider,   $locationProvider) {
-      var tasklistTemplate = require('text!tasklist.html');
+      var tasklistTemplate = require('text!camunda-tasklist/index.html');
 
       $routeProvider
-        .when('/process', {
+        .when('/', {
+          template: tasklistTemplate,
+          controller: 'pilesCtrl'
+        })
+
+
+        .when('/processes', {
           template: tasklistTemplate,
           controller: 'processStartCtrl'
         })
@@ -87,18 +93,17 @@ define('camunda-tasklist', [
         })
 
 
-        .when('/', {
-          template: tasklistTemplate,
-          controller: 'pilesCtrl'
-        })
-
-
         .when('/login', {
           template: tasklistTemplate,
-          controller: [function() {
-            console.warn('Present a login form...');
-          }]
+          controller: 'userLoginCtrl'
         })
+
+
+        .when('/logout', {
+          template: tasklistTemplate,
+          controller: 'userLogoutCtrl'
+        })
+
 
         .otherwise({
           redirectTo: '/'

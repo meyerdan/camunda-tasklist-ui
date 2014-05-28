@@ -2,19 +2,10 @@
 
 
 
-    <!-- # page-navigation partial -->
-    <!-- <div ng-include="'partials/page-navigation.html'"></div> -->
-    <div class="navbar navbar-inverse navbar-fixed-top">
-      <div class="navbar-inner">
-        <div class="container-fluid">
-          <a class="brand ir"
-            href="#/">
-            camunda Tasklist
-          </a>
-        </div>
-      </div>
-    </div>
-    <!-- / page-navigation partial -->
+    <!-- # page-navigation -->
+    <nav class="navbar navbar-default" role="navigation" cam-tasklist-navigation>
+    </nav>
+    <!-- / page-navigation -->
 
 
 
@@ -29,7 +20,7 @@
           </div>
         </div>
 
-        <div class="cols col-sm-4 focused-pile">
+        <div class="cols col-sm-4 current-pile">
           <div class="inner">
             <div class="row">
               <div class="col-xs-6">
@@ -64,7 +55,7 @@
           </div>
         </div>
 
-        <div class="cols col-sm-6 focused-task">
+        <div class="cols col-sm-6 current-task">
           <div class="inner">
             <h5>&nbsp;</h5>
           </div>
@@ -82,7 +73,7 @@
           <div cam-tasklist-pile-tasks></div>
         </div>
 
-        <div class="cols col-sm-6 focused-task">
+        <div class="cols col-sm-6 current-task">
           <div cam-tasklist-task></div>
         </div>
       </div>

@@ -83,7 +83,7 @@ define([
   sessionDataModule.factory('camSessionData', [
           '$q',
   function($q) {
-    return new CamSessionData({$q: $q});
+    return new CamSessionData({defer: $q.defer});
   }]);
 
   return sessionDataModule;

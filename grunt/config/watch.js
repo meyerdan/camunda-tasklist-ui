@@ -9,17 +9,18 @@ module.exports = function(config) {
     assets: {
       files: [
         'client/{fonts,images}/**/*',
-        'client/*.html',
+        'client/index.html',
         'client/favicon.ico'
       ],
       tasks: [
-        'copy:assets'
+        'newer:copy:assets'
       ]
     },
 
     styles: {
       files: [
-        'client/styles/**/*.{css,less}'
+        'client/styles/**/*.{css,less}',
+        'client/scripts/*/*.{css,less}'
       ],
       tasks: [
         'less'
@@ -29,6 +30,7 @@ module.exports = function(config) {
     scripts: {
       files: [
         'grunt/config/requirejs.js',
+        'client/tasklist.html',
         'client/scripts/**/*.{js,html}'
       ],
       tasks: [

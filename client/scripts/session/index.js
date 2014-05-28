@@ -3,8 +3,7 @@ if (typeof define !== 'function') { var define = require('amdefine')(module); }
 /* jshint unused: false */
 define([
            'require', 'angular', 'moment',
-           'camunda-tasklist/sessions/data',
-           'text!camunda-tasklist/sessions/login.html'
+           'camunda-tasklist/session/data'
 ], function(require,   angular,   moment) {
 
   /**
@@ -21,17 +20,17 @@ define([
     'cam.form'
   ]);
 
-  sessionModule.controller('sessionStartModalCtrl', [
-          '$modalInstance',
-  function($modalInstance) {
-    console.warn('Yada yada.....');
-  }]);
+  // sessionModule.controller('sessionStartModalCtrl', [
+  //         '$modalInstance',
+  // function($modalInstance) {
+  //   console.warn('Yada yada.....');
+  // }]);
 
-  sessionModule.controller('sessionStartCtrl', [
-          '$modal', '$scope', '$rootScope',
-  function($modal,   $scope,   $rootScope) {
-    console.warn('Should open a modal window with sessions.');
-  }]);
+  // sessionModule.controller('sessionStartCtrl', [
+  //         '$modal', '$scope', '$rootScope',
+  // function($modal,   $scope,   $rootScope) {
+  //   console.warn('Should open a modal window with session.');
+  // }]);
 
   return sessionModule;
 });

@@ -40,8 +40,8 @@ define([
               .addClass('active')
           ;
 
-          $rootScope.focusedPile = scope.pile;
-          $rootScope.$emit('tasklist.pile.focused');
+          $rootScope.currentPile = scope.pile;
+          $rootScope.$emit('tasklist.pile.current');
         };
 
         scope.edit = function() {
@@ -125,26 +125,31 @@ define([
       link: function(scope) {
         scope.now = new Date();
         scope.tasks = scope.tasks || [];
-        scope.pile = scope.pile || $rootScope.focusedPile;
+        scope.pile = scope.pile || $rootScope.currentPile;
 
         scope.batchOperationSelect = function() {
           console.info('selected task', this);
         };
 
-        $rootScope.$on('tasklist.pile.focused', function() {
-          camPileData.query($rootScope.focusedPile, function(err, results) {
-            if (err) {
-              throw err;
-            }
+        // $rootScope.$on('tasklist.pile.current', function() {
+        $rootScope.$watch('currentPile', function() {
+          if (!$rootScope.currentPile) {
+            return;
+          }
 
-            console.info('tasklist.pile.focused tasks', results);
-            $rootScope.focusedPile.tasks = scope.tasks = results;
+          camPileData.tasks($rootScope.currentPile).then(function(results) {
+            console.info('tasklist.pile.current tasks', results);
+            $rootScope.currentPile.tasks = scope.tasks = results;
+          }, function(err) {
+            console.warn('tasklist.pile.current tasks', err);
           });
         });
 
+
+
         scope.focus = function(delta) {
-          $rootScope.focusedTask = scope.tasks[delta];
-          $rootScope.$emit('tasklist.task.focused');
+          $rootScope.currentTask = scope.tasks[delta];
+          $rootScope.$emit('tasklist.task.current');
         };
       },
 
@@ -168,8 +173,8 @@ define([
     }).then(function(piles) {
       console.info('camPileData piles', piles);
       $scope.piles = piles;
-      $rootScope.focusedPile = $scope.piles[2];
-      $rootScope.$emit('tasklist.pile.focused');
+      $rootScope.currentPile = $scope.piles[2];
+      $rootScope.$emit('tasklist.pile.current');
     }, function(err) {
       console.info('camPileData query error', err.stack);
     });
@@ -180,7 +185,7 @@ define([
           '$modal', '$scope', '$rootScope',
   function($modal,   $scope,   $rootScope) {
     console.warn('Should open a modal window with new pile form.');
-    $rootScope.focusedPile = {
+    $rootScope.currentPile = {
       name: '',
       description: '',
       color: '',

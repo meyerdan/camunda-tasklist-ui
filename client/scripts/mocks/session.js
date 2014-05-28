@@ -2,8 +2,8 @@
 if (typeof define !== 'function') { var define = require('amdefine')(module); }
 /* jshint unused: false */
 define([
-           'angular', 'uuid', 'fixturer', 'underscore', 'jquery', 'camunda-tasklist/session/data'
-], function(angular,   uuid,   fix,        _,            $) {
+           'angular', 'fixturer', 'underscore', 'jquery', 'camunda-tasklist/session/data'
+], function(angular,   fix,        _,            $) {
 
   var mockedModule = angular.module('cam.tasklist.session.data');
 
@@ -12,49 +12,62 @@ define([
 
   // sexyness: https://github.com/appendto/jquery-mockjax
   $.mockjax({
-    method: 'GET',
-    contentType: 'application/hal+json',
+    contentType: 'application/json',
 
-    url: '/tasklist/sessions',
+    type: 'POST',
+    url: '/camunda/api/admin/auth/user/default/login/tasklist',
+    data: {
+      username: 'jonny1',
+      password: 'jonny1'
+    },
     response: function() {
-      var hal = {
-        _links: {
-          self: {
-            href: '/tasklist/sessions'
-          }
-        },
-        _embedded: {
-          sessions: _.toArray(_mockedSessions)
-        }
-      };
+      this.status = 201;
+      this.contentType = 'application/json';
+      this.responseText = JSON.stringify({
+        userId: 'jonny1',
+        authorizedApps: [
+          'cockpit',
+          'admin',
+          'tasklist'
+        ]
+      });
+    }
+  });
 
-      this.responseText = JSON.stringify(hal);
+
+
+
+  $.mockjax({
+    contentType: 'application/json',
+
+    type: 'POST',
+    url: '/tasklist/sessions',
+    data: {
+      username: 'jonny1',
+      password: 'jonny1'
+    },
+    response: function() {
+      this.status = 201;
+      this.contentType = 'application/json';
+      this.responseText = JSON.stringify({
+        userId: 'jonny1',
+        authorizedApps: [
+          'cockpit',
+          'admin',
+          'tasklist'
+        ]
+      });
     }
   });
 
   $.mockjax({
-    method: 'POST',
-    contentType: 'application/hal+json',
+    contentType: 'application/json',
 
+    type: 'POST',
     url: '/tasklist/sessions',
     response: function() {
-
-      console.info(this);
-
-      this.status = 201;
-
-      // var hal = {
-      //   _links: {
-      //     self: {
-      //       href: '/tasklist/sessions'
-      //     }
-      //   },
-      //   _embedded: {
-      //     sessions: _.toArray(_mockedSessions)
-      //   }
-      // };
-
-      // this.responseText = JSON.stringify(hal);
+      this.status = 401;
+      this.responseText = '';
     }
   });
 

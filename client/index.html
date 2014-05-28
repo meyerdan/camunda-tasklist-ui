@@ -18,7 +18,7 @@
   <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
   <![endif]-->
 
-  <link rel="shortcut icon" href="/favicon.ico">
+  <link rel="shortcut icon" href="favicon.ico">
   <link rel="apple-touch-icon" href="images/apple-touch-icon.png">
   <link rel="apple-touch-icon" sizes="72x72" href="images/apple-touch-icon-72x72.png">
   <link rel="apple-touch-icon" sizes="114x114" href="images/apple-touch-icon-114x114.png">
@@ -35,7 +35,35 @@
     </div>
   </footer>
 
-  <script type="text/javascript" src="scripts/deps.js" data-main="scripts/camunda-tasklist"></script>
+  <script type="text/javascript">
+    var root = '//'+ location.host +'/'; // $APP_ROOT, $BASE
+    var tasklistConf = {
+      'cam.tasklist': {
+        useMocks: true
+      },
+
+      'cam.tasklist.navigation': {
+        links: [
+          {
+            // title: '',
+            // css: '',
+            icon: 'home',
+            links: [
+              {
+                title: 'Cockpit',
+                href: root +'camunda/app/cockpit'
+              },
+              {
+                title: 'Admin',
+                href: root +'camunda/app/admin'
+              }
+            ]
+          }
+        ]
+      }
+    };
+  </script>
+  <script type="text/javascript" src="scripts/deps-n-mocks.js" data-main="scripts/camunda-tasklist"></script>
   <script type="text/javascript">
   document.write('<s'+'cript src="//'+ location.hostname +':'+ (parseInt(location.port, 10)+1) +'/livereload.js?snipver=1"><'+'/script>')
   </script>

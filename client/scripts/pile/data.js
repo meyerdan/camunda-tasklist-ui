@@ -38,8 +38,8 @@ define([
 
   function CamPileData(config) {
     config = config || {};
-    if (!config.$q) { throw new Error('$q must be passed in the configuration'); }
-    this.$q = config.$q;
+    if (!config.defer) { throw new Error('$q must be passed in the configuration'); }
+    this.defer = config.defer;
   }
 
   CamPileData.prototype.get   = function() {
@@ -47,7 +47,7 @@ define([
   };
 
   CamPileData.prototype.query = function(options) {
-    var deferred = this.$q.defer();
+    var deferred = this.defer();
     options = options || {};
 
     deferred.notify('request:start');
@@ -74,10 +74,32 @@ define([
     return deferred.promise;
   };
 
+  CamPileData.prototype.tasks = function(options) {
+    var deferred = this.defer();
+    options = options || {};
+
+    deferred.notify('request:start');
+
+    $.ajax({
+      url: '/tasklist/piles/'+ options.id
+    })
+    .done(function(data) {
+      deferred.resolve(data);
+    })
+    .fail(function(jqXHR, textStatus, errorThrown) {
+      deferred.reject(textStatus);
+    })
+    .always(function() {
+      deferred.notify('request:complete');
+    });
+
+    return deferred.promise;
+  };
+
   pileDataModule.factory('camPileData', [
           '$q',
   function($q) {
-    return new CamPileData({$q: $q});
+    return new CamPileData({defer: $q.defer});
   }]);
 
   return pileDataModule;

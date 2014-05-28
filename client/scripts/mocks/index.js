@@ -5,7 +5,8 @@ define([
            'camunda-tasklist/mocks/pile',
            'camunda-tasklist/mocks/task',
            'camunda-tasklist/mocks/user',
-           'camunda-tasklist/mocks/session'
+           'camunda-tasklist/mocks/session',
+           'camunda-tasklist/mocks/process'
 ], function(angular) {
 
   /**
