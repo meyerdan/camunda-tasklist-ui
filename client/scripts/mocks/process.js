@@ -45,12 +45,12 @@ define([
   }
 
 
+
   // not when integrated into camunda-bpm-platform
   if ($('base').attr('href') === '/') {
     $.mockjax({
       method: 'GET',
       contentType: 'application/json',
-
       url: '/camunda/api/engine/engine/default/process-definition',
       response: function() {
         var arr = _.toArray(_mockedProcesses).slice(0, 20);
@@ -61,7 +61,6 @@ define([
     $.mockjax({
       method: 'GET',
       contentType: 'application/json',
-
       url: '/camunda/api/engine/engine/default/process-definition/count',
       response: function() {
         var arr = _.toArray(_mockedProcesses);
@@ -72,10 +71,9 @@ define([
     $.mockjax({
       method: 'POST',
       contentType: 'application/json',
-
-      // url: '/camunda/api/engine/engine/default/process-definition/key/*/start',
       url: /\/camunda\/api\/engine\/engine\/default\/process-definition\/key\/([a-z0-9-_]+)\/start/i,
       urlParams: ['key'],
+      // http://docs.camunda.org/latest/api-references/rest/#process-definition-start-process-instance-result
       response: function(settings) {
         this.responseText = {
           // String  The id of the process instance.
@@ -101,7 +99,7 @@ define([
 
   $.mockjax({
     method: 'GET',
-    // contentType: 'application/hal+json',
+    contentType: 'application/hal+json',
 
     url: '/tasklist/processes',
     response: function() {
@@ -122,7 +120,7 @@ define([
 
   $.mockjax({
     method: 'GET',
-    // contentType: 'application/hal+json',
+    contentType: 'application/hal+json',
 
     url: /\/tasklist\/processes\/([0-9a-z-]+)$/g,
     data: ['processId'],

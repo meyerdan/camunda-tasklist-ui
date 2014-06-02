@@ -10,24 +10,49 @@ define([
 
 
 
+  function replaceVars(str, vars) {
+    for (var v in vars) {
+      str = str.replace(new RegExp('{{'+ v +'}}', 'g'), vars[v]);
+    }
+    return str;
+  }
+
+
+
+
+
+
+
+
+
 
   function CamLegacyProcessData(config) {
     config = config || {};
     if (!config.defer) { throw new Error('defer must be passed in the configuration'); }
     this.defer = config.defer;
+    this.baseUrl = config.baseUrl || '/camunda/api/engine/engine/default';
   }
 
-  CamLegacyProcessData.prototype.get = function(id, options) {};
-
-  // http://stage.docs.camunda.org/api-references/rest/#process-definition-get-definitions
   CamLegacyProcessData.prototype.query = function(options) {
-    var deferred = this.defer();
     options = options || {};
 
-    $.ajax({
-      dataType: 'json',
-      url: '/camunda/api/engine/engine/default/process-definition'
-    })
+    var deferred = this.defer();
+    var reqParams = {
+      type:         options.type || 'GET',
+      dataType:     'json',
+      contentType:  'application/json;charset=UTF-8',
+      url:          this.baseUrl + replaceVars(options.path || '', options.instance || {})
+    };
+
+    if (options.data) {
+      reqParams.data = JSON.stringify(options.data);
+    }
+
+    // console.info('request parameters', reqParams);
+
+    deferred.notify('request:start');
+
+    $.ajax(reqParams)
     .done(function(data) {
       deferred.resolve(data);
     })
@@ -41,84 +66,50 @@ define([
     return deferred.promise;
   };
 
-  // http://docs.camunda.org/latest/api-references/rest/#process-definition-get-definitions-count
-  CamLegacyProcessData.prototype.count = function(options) {
-    var deferred = this.defer();
-    options = options || {};
-
-    $.ajax({
-      dataType: 'json',
-      url: '/camunda/api/engine/engine/default/process-definition/count'
-    })
-    .done(function(data) {
-      deferred.resolve(data);
-    })
-    .fail(function(jqXHR, textStatus, errorThrown) {
-      deferred.reject(textStatus);
-    })
-    .always(function() {
-      deferred.notify('request:complete');
+  CamLegacyProcessData.prototype.list = function(where) {
+    where = where || {};
+    return this.query({
+      path: '/process-definition'
     });
-
-    return deferred.promise;
   };
 
-  // http://stage.docs.camunda.org/api-references/rest/#process-definition-start-process-instance
+  CamLegacyProcessData.prototype.count = function(where) {
+    where = where || {};
+    return this.query({
+      path: '/process-definition/count'
+    });
+  };
+
+  CamLegacyProcessData.prototype.byId = function(id) {
+    return this.query({
+      path: '/process-definition/{{id}}',
+      instance: {
+        id: id
+      }
+    });
+  };
+
+  CamLegacyProcessData.prototype.byKey = function(key) {
+    return this.query({
+      path: '/process-definition/key/{{key}}',
+      instance: {
+        key: key
+      }
+    });
+  };
+
   CamLegacyProcessData.prototype.start = function(key, options) {
-    // /camunda/api/engine/engine/default/process-definition/key/{key}/start
-    var deferred = this.defer();
     options = options || {};
+    options.data = options.data || {variables: {}};
 
-
-    // POST /camunda/api/engine/engine/default/process-definition/d06afcf4-e59f-11e3-89e2-a44e31a96f6c/submit-form HTTP/1.1
-    // Host:              localhost:8080
-    // Connection:        keep-alive
-    // Content-Length:    16
-    // Accept:            application/json, text/plain, */*
-    // Origin:            http://localhost:8080
-    // User-Agent:        Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/34.0.1847.137 Safari/537.36
-    // Content-Type:      application/json;charset=UTF-8
-    // DNT:               1
-    // Referer:           http://localhost:8080/camunda/app/tasklist/default/
-    // Accept-Encoding:   gzip,deflate,sdch
-    // Accept-Language:   en-US,en;q=0.8,de;q=0.6
-    // Cookie:            JSESSIONID=1w5ha3nx429xy1cr7d1pebd86w; __ngDebug=true
-    //
-    //
-    //
-    // POST /camunda/api/engine/engine/default/process-definition/key/TwoParallelCallActivitiesCallingDifferentProcess/start HTTP/1.1
-    // Host:              localhost:8080
-    // Connection:        keep-alive
-    // Content-Length:    0
-    // Accept:            application/json, text/javascript, */*; q=0.01
-    // Origin:            http://localhost:8080
-    // X-Requested-With:  XMLHttpRequest
-    // User-Agent:        Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/34.0.1847.137 Safari/537.36
-    // Content-Type:      application/json;charset=UTF-8
-    // DNT:               1
-    // Referer:           http://localhost:8080/camunda/app/tasklist/default/
-    // Accept-Encoding:   gzip,deflate,sdch
-    // Accept-Language:   en-US,en;q=0.8,de;q=0.6
-    // Cookie:            JSESSIONID=1nl5ajioo4acl1jvvxpgxukzuo; __ngDebug=true
-
-
-
-    $.ajax({
+    return this.query({
       type: 'POST',
-      dataType: 'json',
-      url: '/camunda/api/engine/engine/default/process-definition/key/'+ key +'/start'
-    })
-    .done(function(data) {
-      deferred.resolve(data);
-    })
-    .fail(function(jqXHR, textStatus, errorThrown) {
-      deferred.reject(textStatus);
-    })
-    .always(function() {
-      deferred.notify('request:complete');
+      path: '/process-definition/key/{{key}}/start',
+      instance: {
+        key: key
+      },
+      data: options.data
     });
-
-    return deferred.promise;
   };
 
   processDataModule.factory('camLegacyProcessData', [
@@ -126,6 +117,15 @@ define([
   function($q) {
     return new CamLegacyProcessData({defer: $q.defer});
   }]);
+
+
+
+
+
+
+
+
+
 
 
 
@@ -197,6 +197,11 @@ define([
   function($q) {
     return new CamProcessData({defer: $q.defer});
   }]);
+
+
+
+
+
 
 
 

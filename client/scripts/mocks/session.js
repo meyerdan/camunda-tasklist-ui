@@ -10,37 +10,33 @@ define([
   var _mockedSessions = {};
   var id;
 
-  // sexyness: https://github.com/appendto/jquery-mockjax
-  $.mockjax({
-    contentType: 'application/json',
-
-    type: 'POST',
-    url: '/camunda/api/admin/auth/user/default/login/tasklist',
-    data: {
-      username: 'jonny1',
-      password: 'jonny1'
-    },
-    response: function() {
-      this.status = 201;
-      this.contentType = 'application/json';
-      this.responseText = JSON.stringify({
-        userId: 'jonny1',
-        authorizedApps: [
-          'cockpit',
-          'admin',
-          'tasklist'
-        ]
-      });
-    }
-  });
-
-
-
+  if ($('base').attr('href') === '/') {
+    $.mockjax({
+      type: 'POST',
+      contentType: 'application/json;charset=utf-8',
+      url: '/camunda/api/admin/auth/user/default/login/tasklist',
+      data: {
+        username: 'jonny1',
+        password: 'jonny1'
+      },
+      response: function() {
+        this.status = 201;
+        this.contentType = 'application/json';
+        this.responseText = JSON.stringify({
+          userId: 'jonny1',
+          authorizedApps: [
+            'cockpit',
+            'admin',
+            'tasklist'
+          ]
+        });
+      }
+    });
+  }
 
   $.mockjax({
-    contentType: 'application/json',
-
     type: 'POST',
+    contentType: 'application/json;charset=utf-8',
     url: '/tasklist/sessions',
     data: {
       username: 'jonny1',
@@ -61,9 +57,8 @@ define([
   });
 
   $.mockjax({
-    contentType: 'application/json',
-
     type: 'POST',
+    contentType: 'application/json;charset=utf-8',
     url: '/tasklist/sessions',
     response: function() {
       this.status = 401;

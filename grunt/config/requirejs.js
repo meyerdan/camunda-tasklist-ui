@@ -99,13 +99,10 @@ module.exports = function(config) {
         // exclude: deps,
         exclude: deps.concat([
           'camunda-tasklist/rjsconf',
-          'camunda-tasklist/mocks',
+          // 'camunda-tasklist/mocks',
           'angular-route'
         ]),
-        include: rjsConf.shim['camunda-tasklist'].concat([
-          // 'hyperagent',
-          // 'camunda-tasklist/mocks'
-        ])
+        include: rjsConf.shim['camunda-tasklist']
       }
     }
   };

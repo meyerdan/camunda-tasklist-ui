@@ -47,6 +47,7 @@ define([
     $scope.ok = function() {
       $.ajax({
         url: '/tasklist/sessions',
+        contentType: 'application/json;charset=utf-8',
         type: 'POST',
         dataType: 'json',
 

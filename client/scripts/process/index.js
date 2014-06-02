@@ -62,14 +62,9 @@ define([
 
     $scope.getProcess = function(val) {
       $scope.loadingProcesses = true;
-      camLegacyProcessData.query().then(function(res){
+      camLegacyProcessData.list().then(function(res){
         $scope.loadingProcesses = false;
-        var processes = [];
-        console.info('Found', res);
-        // angular.forEach(res.data.results, function(item){
-        //   processes.push(item.formatted_process);
-        // });
-        return processes;
+        $scope.processes = res;
       }, loadError);
     };
 
@@ -81,7 +76,6 @@ define([
 
 
     $scope.removeVariable = function(delta) {
-      console.info('removing variable', delta);
       var vars = [];
 
       angular.forEach($scope.variables, function(variable, d) {
@@ -108,12 +102,12 @@ define([
 
     $scope.loadProcesses = function() {
       $scope.loadingProcesses = true;
-      var query = {};
+      var where = {};
 
-      camLegacyProcessData.count(query).then(function(result) {
+      camLegacyProcessData.count(where).then(function(result) {
         $scope.totalProcesses = result.count;
 
-        camLegacyProcessData.query(query).then(function(processes) {
+        camLegacyProcessData.list(where).then(function(processes) {
           $scope.loadingProcesses = false;
 
           $scope.processes = processes;
@@ -123,12 +117,19 @@ define([
     $scope.loadProcesses();
 
     $scope.submitForm = function(htmlForm) {
-      console.info('htmlForm', htmlForm, $scope);
+      var vars = {};
+
+      angular.forEach($scope.variables, function(val) {
+        if (val.name[0] !== '$') {
+          vars[val.name] = {type: val.type, value: val.value};
+        }
+      });
 
       camLegacyProcessData.start($scope.startingProcess.key, {
-        data: $scope.variables
+        data: {
+          variables: vars
+        }
       }).then(function(result) {
-        console.info('Started process with key', result);
         close(result);
       }, loadError);
     };
